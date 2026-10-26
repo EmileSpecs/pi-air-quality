@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Air quality{% endblock %}</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: system-ui, sans-serif; margin: 0; line-height: 1.4; }
+    header, main { max-width: 40rem; margin: 0 auto; padding: 1rem 1.25rem; }
+    header { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+    nav a { margin-right: 1rem; }
+    h1 { font-size: 1.35rem; margin: 0; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .card { border: 1px solid color-mix(in srgb, CanvasText 18%, transparent); border-radius: 0.5rem; padding: 0.75rem 1rem; }
+    .label { font-size: 0.85rem; opacity: 0.75; }
+    .value { font-size: 1.6rem; margin-top: 0.15rem; }
+    label { display: block; margin-top: 0.85rem; }
+    input[type="text"], input[type="password"], input[type="number"] { width: 100%; box-sizing: border-box; padding: 0.4rem 0.5rem; }
+    button { margin-top: 1rem; margin-right: 0.5rem; padding: 0.45rem 0.8rem; }
+    .error { color: #a32020; }
+    .notice { color: #0b6b2a; }
+    .muted { opacity: 0.75; }
+    form.inline { display: inline; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>{{ config.device.name }}</h1>
+    <nav>
+      <a href="/status">Status</a>
+      <a href="/connection">Connection</a>
+      <form class="inline" method="post" action="/logout"><button type="submit">Sign out</button></form>
+    </nav>
+  </header>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "piair"
+version = "1.0.0"
+description = "Air-quality sensors on a Raspberry Pi kiosk, published to Home Assistant over MQTT."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+    "aiohttp>=3.9",
+    "aiomqtt>=2.0",
+    "Jinja2>=3.1",
+    "pydantic>=2.0",
+    "PyYAML>=6.0",
+    "smbus2>=0.4",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+]
+
+[project.scripts]
+piaird = "piair.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["piair*"]
+
+[tool.setuptools.package-data]
+piair = ["web/templates/*.html"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = ["ignore::aiohttp.web_exceptions.NotAppKeyWarning"]

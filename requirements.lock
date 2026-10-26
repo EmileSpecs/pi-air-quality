@@ -1,0 +1,46 @@
+#
+# Pinned for the Raspberry Pi installer. Generated to match the video kiosk
+# pins, plus smbus2 for /dev/i2c-1.
+#
+aiohappyeyeballs==2.7.1
+    # via aiohttp
+aiohttp==3.14.5
+    # via piair (pyproject.toml)
+aiomqtt==2.5.1
+    # via piair (pyproject.toml)
+aiosignal==1.4.0
+    # via aiohttp
+annotated-types==0.8.0
+    # via pydantic
+async-timeout==5.0.1
+    # via aiohttp
+attrs==26.1.0
+    # via aiohttp
+frozenlist==1.8.0
+    # via aiohttp
+idna==3.20
+    # via yarl
+jinja2==3.1.6
+    # via piair (pyproject.toml)
+markupsafe==3.0.4
+    # via jinja2
+multidict==7.1.0
+    # via aiohttp
+paho-mqtt==2.1.0
+    # via aiomqtt
+propcache==0.5.4
+    # via aiohttp
+pydantic==2.14.1
+    # via piair (pyproject.toml)
+pydantic-core==2.50.1
+    # via pydantic
+pyyaml==6.0.3
+    # via piair (pyproject.toml)
+smbus2==0.5.0
+    # via piair (pyproject.toml)
+typing-extensions==4.16.0
+    # via aiohttp
+typing-inspection==0.4.4
+    # via pydantic
+yarl==1.25.1
+    # via aiohttp

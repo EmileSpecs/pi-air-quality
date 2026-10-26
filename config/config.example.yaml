@@ -1,0 +1,48 @@
+device:
+  id: lounge_air
+  name: "Lounge air"
+  manufacturer: "DIY"
+  model: "Raspberry Pi 5 Air Quality"
+  suggested_area: "Lounge"
+
+mqtt:
+  host: homeassistant.local
+  port: 1883
+  username: kiosk
+  password: !secret mqtt_password
+  client_id: null
+  keepalive: 30
+  base_topic: piair
+  discovery_prefix: homeassistant
+  tls:
+    enabled: false
+    ca_file: null
+    insecure: false
+  reconnect:
+    min_delay_s: 1
+    max_delay_s: 60
+
+sensors:
+  bus: 1
+  interval_s: 1
+  publish_interval_s: 10
+  formaldehyde:
+    enabled: true
+  particulate:
+    enabled: false
+  co2:
+    enabled: false
+
+admin:
+  enabled: true
+  bind: 0.0.0.0
+  port: 8092
+  password: !secret admin_password
+
+logging:
+  level: INFO
+
+update:
+  auto: true
+  repo: null
+  ref: main

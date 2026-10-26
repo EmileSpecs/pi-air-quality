@@ -1,0 +1,209 @@
+{
+  "homeassistant/button/piair_lounge_air/update/config": {
+    "availability": [
+      {
+        "topic": "piair/lounge_air/status"
+      }
+    ],
+    "availability_mode": "all",
+    "command_topic": "piair/lounge_air/cmd/update",
+    "default_entity_id": "button.lounge_air_update",
+    "device": {
+      "configuration_url": "http://192.168.1.20:8092",
+      "hw_version": "Raspberry Pi 5",
+      "identifiers": [
+        "piair_lounge_air"
+      ],
+      "manufacturer": "DIY",
+      "model": "Raspberry Pi 5 Air Quality",
+      "name": "Lounge air",
+      "suggested_area": "Lounge",
+      "sw_version": "1.0.0"
+    },
+    "entity_category": "config",
+    "has_entity_name": true,
+    "icon": "mdi:update",
+    "name": "Update",
+    "origin": {
+      "name": "pi-air-quality",
+      "support_url": "https://github.com/EmileSpecs/pi-air-quality",
+      "sw_version": "1.0.0"
+    },
+    "payload_press": "PRESS",
+    "qos": 1,
+    "unique_id": "piair_lounge_air_update"
+  },
+  "homeassistant/sensor/piair_lounge_air/formaldehyde/config": {
+    "availability": [
+      {
+        "topic": "piair/lounge_air/status"
+      }
+    ],
+    "availability_mode": "all",
+    "default_entity_id": "sensor.lounge_air_formaldehyde",
+    "device": {
+      "configuration_url": "http://192.168.1.20:8092",
+      "hw_version": "Raspberry Pi 5",
+      "identifiers": [
+        "piair_lounge_air"
+      ],
+      "manufacturer": "DIY",
+      "model": "Raspberry Pi 5 Air Quality",
+      "name": "Lounge air",
+      "suggested_area": "Lounge",
+      "sw_version": "1.0.0"
+    },
+    "has_entity_name": true,
+    "icon": "mdi:molecule",
+    "name": "Formaldehyde",
+    "origin": {
+      "name": "pi-air-quality",
+      "support_url": "https://github.com/EmileSpecs/pi-air-quality",
+      "sw_version": "1.0.0"
+    },
+    "qos": 1,
+    "state_class": "measurement",
+    "state_topic": "piair/lounge_air/state",
+    "unique_id": "piair_lounge_air_formaldehyde",
+    "unit_of_measurement": "ppb",
+    "value_template": "{{ value_json.formaldehyde_ppb }}"
+  },
+  "homeassistant/sensor/piair_lounge_air/formaldehyde_status/config": {
+    "availability": [
+      {
+        "topic": "piair/lounge_air/status"
+      }
+    ],
+    "availability_mode": "all",
+    "default_entity_id": "sensor.lounge_air_formaldehyde_status",
+    "device": {
+      "configuration_url": "http://192.168.1.20:8092",
+      "hw_version": "Raspberry Pi 5",
+      "identifiers": [
+        "piair_lounge_air"
+      ],
+      "manufacturer": "DIY",
+      "model": "Raspberry Pi 5 Air Quality",
+      "name": "Lounge air",
+      "suggested_area": "Lounge",
+      "sw_version": "1.0.0"
+    },
+    "entity_category": "diagnostic",
+    "has_entity_name": true,
+    "icon": "mdi:timer-sand",
+    "name": "Formaldehyde status",
+    "origin": {
+      "name": "pi-air-quality",
+      "support_url": "https://github.com/EmileSpecs/pi-air-quality",
+      "sw_version": "1.0.0"
+    },
+    "qos": 1,
+    "state_topic": "piair/lounge_air/state",
+    "unique_id": "piair_lounge_air_formaldehyde_status",
+    "value_template": "{{ value_json.formaldehyde_status }}"
+  },
+  "homeassistant/sensor/piair_lounge_air/humidity/config": {
+    "availability": [
+      {
+        "topic": "piair/lounge_air/status"
+      }
+    ],
+    "availability_mode": "all",
+    "default_entity_id": "sensor.lounge_air_humidity",
+    "device": {
+      "configuration_url": "http://192.168.1.20:8092",
+      "hw_version": "Raspberry Pi 5",
+      "identifiers": [
+        "piair_lounge_air"
+      ],
+      "manufacturer": "DIY",
+      "model": "Raspberry Pi 5 Air Quality",
+      "name": "Lounge air",
+      "suggested_area": "Lounge",
+      "sw_version": "1.0.0"
+    },
+    "device_class": "humidity",
+    "has_entity_name": true,
+    "name": "Humidity",
+    "origin": {
+      "name": "pi-air-quality",
+      "support_url": "https://github.com/EmileSpecs/pi-air-quality",
+      "sw_version": "1.0.0"
+    },
+    "qos": 1,
+    "state_class": "measurement",
+    "state_topic": "piair/lounge_air/state",
+    "unique_id": "piair_lounge_air_humidity",
+    "unit_of_measurement": "%",
+    "value_template": "{{ value_json.humidity_pct }}"
+  },
+  "homeassistant/sensor/piair_lounge_air/temperature/config": {
+    "availability": [
+      {
+        "topic": "piair/lounge_air/status"
+      }
+    ],
+    "availability_mode": "all",
+    "default_entity_id": "sensor.lounge_air_temperature",
+    "device": {
+      "configuration_url": "http://192.168.1.20:8092",
+      "hw_version": "Raspberry Pi 5",
+      "identifiers": [
+        "piair_lounge_air"
+      ],
+      "manufacturer": "DIY",
+      "model": "Raspberry Pi 5 Air Quality",
+      "name": "Lounge air",
+      "suggested_area": "Lounge",
+      "sw_version": "1.0.0"
+    },
+    "device_class": "temperature",
+    "has_entity_name": true,
+    "name": "Temperature",
+    "origin": {
+      "name": "pi-air-quality",
+      "support_url": "https://github.com/EmileSpecs/pi-air-quality",
+      "sw_version": "1.0.0"
+    },
+    "qos": 1,
+    "state_class": "measurement",
+    "state_topic": "piair/lounge_air/state",
+    "unique_id": "piair_lounge_air_temperature",
+    "unit_of_measurement": "\u00b0C",
+    "value_template": "{{ value_json.temperature_c }}"
+  },
+  "homeassistant/sensor/piair_lounge_air/version/config": {
+    "availability": [
+      {
+        "topic": "piair/lounge_air/status"
+      }
+    ],
+    "availability_mode": "all",
+    "default_entity_id": "sensor.lounge_air_version",
+    "device": {
+      "configuration_url": "http://192.168.1.20:8092",
+      "hw_version": "Raspberry Pi 5",
+      "identifiers": [
+        "piair_lounge_air"
+      ],
+      "manufacturer": "DIY",
+      "model": "Raspberry Pi 5 Air Quality",
+      "name": "Lounge air",
+      "suggested_area": "Lounge",
+      "sw_version": "1.0.0"
+    },
+    "entity_category": "diagnostic",
+    "has_entity_name": true,
+    "icon": "mdi:git",
+    "name": "Version",
+    "origin": {
+      "name": "pi-air-quality",
+      "support_url": "https://github.com/EmileSpecs/pi-air-quality",
+      "sw_version": "1.0.0"
+    },
+    "qos": 1,
+    "state_topic": "piair/lounge_air/state",
+    "unique_id": "piair_lounge_air_version",
+    "value_template": "{{ value_json.version }}"
+  }
+}

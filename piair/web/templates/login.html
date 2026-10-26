@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: system-ui, sans-serif; margin: 2rem auto; max-width: 24rem; padding: 0 1rem; }
+    input, button { width: 100%; box-sizing: border-box; padding: 0.45rem 0.5rem; margin-top: 0.75rem; }
+    .error { color: #a32020; }
+  </style>
+</head>
+<body>
+  <h1>Air quality</h1>
+  {% if error %}<p class="error">Password did not match.</p>{% endif %}
+  <form method="post" action="/login">
+    <label>Admin password <input type="password" name="password" autofocus required></label>
+    <button type="submit">Sign in</button>
+  </form>
+</body>
+</html>

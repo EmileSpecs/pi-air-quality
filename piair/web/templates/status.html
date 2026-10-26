@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Status{% endblock %}
+{% block content %}
+  {% if notice %}<p class="notice">{{ notice }}</p>{% endif %}
+  {% if error %}<p class="error">{{ error }}</p>{% endif %}
+  <div class="grid" id="readings">
+    <div class="card"><div class="label">Formaldehyde</div><div class="value" id="hcho">{{ snap.formaldehyde }}</div></div>
+    <div class="card"><div class="label">Status</div><div class="value" id="hcho-status">{{ snap.formaldehyde_status }}</div></div>
+    <div class="card"><div class="label">Temperature</div><div class="value" id="temp">{{ snap.temperature }}</div></div>
+    <div class="card"><div class="label">Humidity</div><div class="value" id="humidity">{{ snap.humidity }}</div></div>
+    {% if snap.particulate_enabled %}
+    <div class="card"><div class="label">PM1</div><div class="value" id="pm1">{{ snap.pm1 }}</div></div>
+    <div class="card"><div class="label">PM2.5</div><div class="value" id="pm25">{{ snap.pm25 }}</div></div>
+    <div class="card"><div class="label">PM10</div><div class="value" id="pm10">{{ snap.pm10 }}</div></div>
+    {% endif %}
+    {% if snap.co2_enabled %}
+    <div class="card"><div class="label">CO2</div><div class="value" id="co2">{{ snap.co2 }}</div></div>
+    {% endif %}
+  </div>
+  <p class="muted" id="meta">MQTT {{ snap.mqtt }} · updated {{ snap.updated }} · {{ snap.version }}</p>
+  {% if snap.detail %}<p class="error" id="detail">{{ snap.detail }}</p>{% else %}<p class="error" id="detail" hidden></p>{% endif %}
+  <h2>Update</h2>
+  <form method="post" action="/update">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <label><input type="checkbox" name="auto" {% if config.update.auto %}checked{% endif %}> Check GitHub automatically</label>
+    <label>Branch <input type="text" name="ref" value="{{ config.update.ref }}"></label>
+    <button type="submit" name="action" value="save">Save</button>
+    <button type="submit" name="action" value="now">Update now</button>
+  </form>
+  <p class="muted">Automatic updates fast-forward <code>{{ config.update.repo or "origin" }}</code> and leave <code>/etc/pi-air</code> alone.</p>
+  <script>
+    async function refresh() {
+      const response = await fetch("/status.json", {cache: "no-store"});
+      if (!response.ok) return;
+      const snap = await response.json();
+      const set = (id, text) => { const node = document.getElementById(id); if (node) node.textContent = text; };
+      set("hcho", snap.formaldehyde);
+      set("hcho-status", snap.formaldehyde_status);
+      set("temp", snap.temperature);
+      set("humidity", snap.humidity);
+      set("pm1", snap.pm1);
+      set("pm25", snap.pm25);
+      set("pm10", snap.pm10);
+      set("co2", snap.co2);
+      set("meta", "MQTT " + snap.mqtt + " · updated " + snap.updated + " · " + snap.version);
+      const detail = document.getElementById("detail");
+      if (detail) {
+        detail.hidden = !snap.detail;
+        detail.textContent = snap.detail || "";
+      }
+    }
+    setInterval(refresh, 5000);
+  </script>
+{% endblock %}

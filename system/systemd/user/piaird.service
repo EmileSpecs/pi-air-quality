@@ -1,0 +1,21 @@
+[Unit]
+Description=Pi air quality sensors (MQTT and local status)
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+ExecStart=/opt/pi-air/venv/bin/piaird --config /etc/pi-air/config.yaml --state %h/.local/state/pi-air/state.json
+Restart=always
+RestartSec=3
+TimeoutStopSec=15
+Environment=PYTHONUNBUFFERED=1
+Environment=PIAIR_ROOT=/opt/pi-air
+WorkingDirectory=%h/.local/state/pi-air
+SyslogIdentifier=piaird
+NoNewPrivileges=yes
+PrivateTmp=yes
+
+[Install]
+WantedBy=default.target

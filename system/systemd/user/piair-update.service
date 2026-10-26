@@ -1,0 +1,7 @@
+[Unit]
+Description=Update Pi air quality from its git branch
+
+[Service]
+Type=oneshot
+ExecStart=/opt/pi-air/bin/piair-update.sh --from-timer
+SyslogIdentifier=piair-update
