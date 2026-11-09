@@ -13,8 +13,7 @@ def state_payload(config: AirConfig, reading: Reading) -> dict[str, Any]:
     sensors = config.sensors
     return reading.public_state(
         formaldehyde=sensors.formaldehyde.enabled,
-        particulate=sensors.particulate.enabled,
-        co2=sensors.co2.enabled,
+        sen69c=sensors.sen69c.enabled,
     )
 
 

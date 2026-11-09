@@ -1,6 +1,6 @@
 # Pi air quality
 
-Formaldehyde, temperature, and humidity from a Sensirion SFA40 on a Raspberry Pi 5 kiosk. The same process can read a PMSA003I particulate sensor and an SCD41 CO2 sensor when those are enabled. Readings are published to Home Assistant with MQTT discovery, the same way the video kiosk publishes its player. A small web page on port 8092 shows the live values and the broker settings. The video kiosk keeps the screen.
+All channels from a Sensirion SEN69C on a Raspberry Pi 5 kiosk: particulate (PM1 / 2.5 / 4 / 10), temperature, humidity, VOC index, NOx index, formaldehyde, and CO2. An optional Sensirion SFA40 can still supply formaldehyde (and climate when the SEN69C is off). Readings are published to Home Assistant with MQTT discovery, the same way the video kiosk publishes its player. A small web page on port 8092 shows the live values and the broker settings. The video kiosk keeps the screen.
 
 ## Wiring
 
@@ -8,25 +8,24 @@ One I2C bus, GPIO 2 (SDA, pin 3) and GPIO 3 (SCL, pin 5), plus 5 V (pin 2) and g
 
 | Sensor | Address | Power | Notes |
 | --- | --- | --- | --- |
-| SEN0661 SFA40 formaldehyde | `0x5D` | 3.3–5 V | Also the room temperature and humidity. Leave the yellow membrane in place. |
-| PMSA003I particles | `0x12` | 5 V, about 100 mA | 3.3 V I2C. Leave SET open or high. Do not hold RESET low. |
-| SEN0536 SCD41 CO2 | `0x62` | 3.3–5 V | CO2 only. Its temperature and humidity are not published. |
+| SEN69C air quality | `0x6B` | 3.3–5 V | PM, climate, VOC, NOx, formaldehyde, CO2. |
+| SFA40 formaldehyde (optional) | `0x5D` | 3.3–5 V | Use when you want the dedicated HCHO board. Leave the yellow membrane in place. |
 
 The bus runs at 100 kHz. The installer enables `i2c_arm` if `config.txt` does not already, and asks for a reboot when it changes that file.
 
-The formaldehyde value is withheld for the first minute after power-up. It is published while the sensor is still settling, and it is within specification after about 10 minutes.
+SEN69C formaldehyde is withheld for about the first minute after measurement starts (`0xFFFF` → status `warming_up`). CO2 and NOx also settle for a short time after start. With an SFA40 enabled, that board owns formaldehyde status instead.
 
-Particulate and CO2 ship turned off:
+Optional SFA40 ships turned off:
 
 ```yaml
 sensors:
-  particulate:
+  sen69c:
     enabled: true
-  co2:
+  formaldehyde:
     enabled: true
 ```
 
-Restart `piaird` after changing that block.
+Restart `piaird` after changing that block. When both are on, the SEN69C still publishes PM, climate, VOC, NOx, and CO2; the SFA40 owns formaldehyde.
 
 ## Install
 
@@ -66,10 +65,11 @@ ssh kiosk@kiosk.local 'sudo -u kiosk /opt/pi-air/bin/piair-update.sh'
 
 Discovery uses the `homeassistant` prefix. One device, `piair_<device id>`, with:
 
-- Formaldehyde in ppb
-- Temperature in °C and humidity in % from the SFA40
-- Formaldehyde status: `warming_up`, `stabilizing`, `ready`, `missing`, or `error`
+- PM1, PM2.5, PM4, and PM10 in µg/m³
+- Temperature in °C and humidity in %
+- VOC index and NOx index
+- Formaldehyde in ppb, with status `warming_up`, `ready`, `missing`, or `error` (plus `stabilizing` when an SFA40 is used)
+- CO2 in ppm
 - Version, and an Update button
-- PM1, PM2.5, PM10, and CO2 when those sensors are enabled
 
 Availability follows `piair/<device id>/status` (`online` / `offline`). The retained reading is `piair/<device id>/state`.

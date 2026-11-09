@@ -12,32 +12,43 @@ class Reading:
     temperature_c: float | None = None
     humidity_pct: float | None = None
     formaldehyde_status: str = "missing"
-    pm1: int | None = None
-    pm25: int | None = None
-    pm10: int | None = None
+    pm1: float | None = None
+    pm25: float | None = None
+    pm4: float | None = None
+    pm10: float | None = None
+    voc_index: float | None = None
+    nox_index: float | None = None
     co2_ppm: int | None = None
     detail: str = ""
     version: str = ""
     updated: str = ""
 
-    def public_state(self, *, formaldehyde: bool, particulate: bool, co2: bool) -> dict[str, Any]:
+    def public_state(self, *, formaldehyde: bool, sen69c: bool) -> dict[str, Any]:
         payload: dict[str, Any] = {"version": self.version, "updated": self.updated}
-        if formaldehyde:
+        publish_hcho = formaldehyde or sen69c
+        publish_climate = formaldehyde or sen69c
+        if publish_hcho:
             payload["formaldehyde_status"] = self.formaldehyde_status
-            publish_hcho = self.formaldehyde_status in {"stabilizing", "ready"}
-            if publish_hcho and self.formaldehyde_ppb is not None:
+            if self.formaldehyde_status in {"stabilizing", "ready"} and self.formaldehyde_ppb is not None:
                 payload["formaldehyde_ppb"] = self.formaldehyde_ppb
+        if publish_climate:
             if self.temperature_c is not None:
                 payload["temperature_c"] = self.temperature_c
             if self.humidity_pct is not None:
                 payload["humidity_pct"] = self.humidity_pct
-        if particulate:
+        if sen69c:
             if self.pm1 is not None:
                 payload["pm1"] = self.pm1
             if self.pm25 is not None:
                 payload["pm25"] = self.pm25
+            if self.pm4 is not None:
+                payload["pm4"] = self.pm4
             if self.pm10 is not None:
                 payload["pm10"] = self.pm10
-        if co2 and self.co2_ppm is not None:
-            payload["co2_ppm"] = self.co2_ppm
+            if self.voc_index is not None:
+                payload["voc_index"] = self.voc_index
+            if self.nox_index is not None:
+                payload["nox_index"] = self.nox_index
+            if self.co2_ppm is not None:
+                payload["co2_ppm"] = self.co2_ppm
         return payload

@@ -4,16 +4,19 @@
   {% if notice %}<p class="notice">{{ notice }}</p>{% endif %}
   {% if error %}<p class="error">{{ error }}</p>{% endif %}
   <div class="grid" id="readings">
+    {% if snap.formaldehyde_enabled %}
     <div class="card"><div class="label">Formaldehyde</div><div class="value" id="hcho">{{ snap.formaldehyde }}</div></div>
     <div class="card"><div class="label">Status</div><div class="value" id="hcho-status">{{ snap.formaldehyde_status }}</div></div>
+    {% endif %}
     <div class="card"><div class="label">Temperature</div><div class="value" id="temp">{{ snap.temperature }}</div></div>
     <div class="card"><div class="label">Humidity</div><div class="value" id="humidity">{{ snap.humidity }}</div></div>
-    {% if snap.particulate_enabled %}
+    {% if snap.sen69c_enabled %}
     <div class="card"><div class="label">PM1</div><div class="value" id="pm1">{{ snap.pm1 }}</div></div>
     <div class="card"><div class="label">PM2.5</div><div class="value" id="pm25">{{ snap.pm25 }}</div></div>
+    <div class="card"><div class="label">PM4</div><div class="value" id="pm4">{{ snap.pm4 }}</div></div>
     <div class="card"><div class="label">PM10</div><div class="value" id="pm10">{{ snap.pm10 }}</div></div>
-    {% endif %}
-    {% if snap.co2_enabled %}
+    <div class="card"><div class="label">VOC index</div><div class="value" id="voc">{{ snap.voc_index }}</div></div>
+    <div class="card"><div class="label">NOx index</div><div class="value" id="nox">{{ snap.nox_index }}</div></div>
     <div class="card"><div class="label">CO2</div><div class="value" id="co2">{{ snap.co2 }}</div></div>
     {% endif %}
   </div>
@@ -40,7 +43,10 @@
       set("humidity", snap.humidity);
       set("pm1", snap.pm1);
       set("pm25", snap.pm25);
+      set("pm4", snap.pm4);
       set("pm10", snap.pm10);
+      set("voc", snap.voc_index);
+      set("nox", snap.nox_index);
       set("co2", snap.co2);
       set("meta", "MQTT " + snap.mqtt + " · updated " + snap.updated + " · " + snap.version);
       const detail = document.getElementById("detail");

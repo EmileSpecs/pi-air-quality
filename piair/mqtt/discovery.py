@@ -75,6 +75,67 @@ def _sensor(
     return body
 
 
+def _add_formaldehyde(add, config: AirConfig, topics: Topics) -> None:
+    add(
+        "sensor",
+        "formaldehyde",
+        _sensor(
+            config,
+            topics,
+            "formaldehyde",
+            "Formaldehyde",
+            "formaldehyde_ppb",
+            unit_of_measurement="ppb",
+            state_class="measurement",
+            icon="mdi:molecule",
+        ),
+    )
+    add(
+        "sensor",
+        "formaldehyde_status",
+        _sensor(
+            config,
+            topics,
+            "formaldehyde_status",
+            "Formaldehyde status",
+            "formaldehyde_status",
+            entity_category="diagnostic",
+            icon="mdi:timer-sand",
+        ),
+    )
+
+
+def _add_climate(add, config: AirConfig, topics: Topics) -> None:
+    add(
+        "sensor",
+        "temperature",
+        _sensor(
+            config,
+            topics,
+            "temperature",
+            "Temperature",
+            "temperature_c",
+            device_class="temperature",
+            unit_of_measurement="°C",
+            state_class="measurement",
+        ),
+    )
+    add(
+        "sensor",
+        "humidity",
+        _sensor(
+            config,
+            topics,
+            "humidity",
+            "Humidity",
+            "humidity_pct",
+            device_class="humidity",
+            unit_of_measurement="%",
+            state_class="measurement",
+        ),
+    )
+
+
 def build_component_payloads(
     config: AirConfig,
     ctx: DiscoveryContext | None = None,
@@ -89,83 +150,56 @@ def build_component_payloads(
         built[topics.discovery_topic(component, object_id)] = payload
 
     sensors = config.sensors
-    if sensors.formaldehyde.enabled:
-        add(
-            "sensor",
-            "formaldehyde",
-            _sensor(
-                config,
-                topics,
-                "formaldehyde",
-                "Formaldehyde",
-                "formaldehyde_ppb",
-                unit_of_measurement="ppb",
-                state_class="measurement",
-                icon="mdi:molecule",
-            ),
-        )
-        add(
-            "sensor",
-            "temperature",
-            _sensor(
-                config,
-                topics,
-                "temperature",
-                "Temperature",
-                "temperature_c",
-                device_class="temperature",
-                unit_of_measurement="°C",
-                state_class="measurement",
-            ),
-        )
-        add(
-            "sensor",
-            "humidity",
-            _sensor(
-                config,
-                topics,
-                "humidity",
-                "Humidity",
-                "humidity_pct",
-                device_class="humidity",
-                unit_of_measurement="%",
-                state_class="measurement",
-            ),
-        )
-        add(
-            "sensor",
-            "formaldehyde_status",
-            _sensor(
-                config,
-                topics,
-                "formaldehyde_status",
-                "Formaldehyde status",
-                "formaldehyde_status",
-                entity_category="diagnostic",
-                icon="mdi:timer-sand",
-            ),
-        )
-    if sensors.particulate.enabled:
+    publish_hcho = sensors.formaldehyde.enabled or sensors.sen69c.enabled
+    publish_climate = sensors.formaldehyde.enabled or sensors.sen69c.enabled
+
+    if publish_hcho:
+        _add_formaldehyde(add, config, topics)
+    if publish_climate:
+        _add_climate(add, config, topics)
+
+    if sensors.sen69c.enabled:
         for object_id, name, field, device_class in (
             ("pm1", "PM1", "pm1", "pm1"),
             ("pm25", "PM2.5", "pm25", "pm25"),
+            ("pm4", "PM4", "pm4", None),
             ("pm10", "PM10", "pm10", "pm10"),
         ):
-            add(
-                "sensor",
-                object_id,
-                _sensor(
-                    config,
-                    topics,
-                    object_id,
-                    name,
-                    field,
-                    device_class=device_class,
-                    unit_of_measurement="µg/m³",
-                    state_class="measurement",
-                ),
-            )
-    if sensors.co2.enabled:
+            extra: dict[str, Any] = {
+                "unit_of_measurement": "µg/m³",
+                "state_class": "measurement",
+            }
+            if device_class is not None:
+                extra["device_class"] = device_class
+            else:
+                extra["icon"] = "mdi:dots-hexagon"
+            add("sensor", object_id, _sensor(config, topics, object_id, name, field, **extra))
+        add(
+            "sensor",
+            "voc_index",
+            _sensor(
+                config,
+                topics,
+                "voc_index",
+                "VOC index",
+                "voc_index",
+                state_class="measurement",
+                icon="mdi:smell",
+            ),
+        )
+        add(
+            "sensor",
+            "nox_index",
+            _sensor(
+                config,
+                topics,
+                "nox_index",
+                "NOx index",
+                "nox_index",
+                state_class="measurement",
+                icon="mdi:molecule-co",
+            ),
+        )
         add(
             "sensor",
             "co2",
@@ -180,6 +214,7 @@ def build_component_payloads(
                 state_class="measurement",
             ),
         )
+
     add(
         "sensor",
         "version",

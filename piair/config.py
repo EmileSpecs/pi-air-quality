@@ -126,9 +126,8 @@ class SensorsConfig(BaseModel):
     bus: int = 1
     interval_s: float = 1
     publish_interval_s: float = 10
-    formaldehyde: SensorBlock = Field(default_factory=lambda: SensorBlock(enabled=True))
-    particulate: SensorBlock = Field(default_factory=SensorBlock)
-    co2: SensorBlock = Field(default_factory=SensorBlock)
+    sen69c: SensorBlock = Field(default_factory=lambda: SensorBlock(enabled=True))
+    formaldehyde: SensorBlock = Field(default_factory=SensorBlock)
 
     @field_validator("interval_s", "publish_interval_s")
     @classmethod

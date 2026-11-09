@@ -27,14 +27,16 @@ def _write(directory: Path) -> Path:
 def test_secrets_and_env_override(tmp_path: Path) -> None:
     config = load_config(
         _write(tmp_path),
-        environ={"PIAIR__MQTT__HOST": "10.1.1.8", "PIAIR__SENSORS__CO2__ENABLED": "true"},
+        environ={
+            "PIAIR__MQTT__HOST": "10.1.1.8",
+            "PIAIR__SENSORS__FORMALDEHYDE__ENABLED": "true",
+        },
     )
     assert config.mqtt.password == "secret-mqtt"
     assert config.admin.password == "secret-admin"
     assert config.mqtt.host == "10.1.1.8"
-    assert config.sensors.co2.enabled is True
+    assert config.sensors.sen69c.enabled is True
     assert config.sensors.formaldehyde.enabled is True
-    assert config.sensors.particulate.enabled is False
 
 
 def test_missing_secret(tmp_path: Path) -> None:

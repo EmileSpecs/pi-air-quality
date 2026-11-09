@@ -26,11 +26,9 @@ sensors:
   bus: 1
   interval_s: 1
   publish_interval_s: 10
-  formaldehyde:
+  sen69c:
     enabled: true
-  particulate:
-    enabled: false
-  co2:
+  formaldehyde:
     enabled: false
 
 admin:
