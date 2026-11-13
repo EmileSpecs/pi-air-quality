@@ -35,6 +35,15 @@ def test_health_is_open_and_status_requires_login(tmp_path: Path) -> None:
                 "voc_index": "100.0",
                 "nox_index": "1.0",
                 "co2": "640 ppm",
+                "co2_band": "green",
+                "co2_calibration_status": "setup applied",
+                "formaldehyde_band": "green",
+                "pm1_band": "green",
+                "pm25_band": "green",
+                "pm4_band": "green",
+                "pm10_band": "green",
+                "voc_band": "green",
+                "nox_band": "green",
                 "sen69c_enabled": True,
                 "formaldehyde_enabled": True,
                 "mqtt": "connected",
@@ -42,6 +51,7 @@ def test_health_is_open_and_status_requires_login(tmp_path: Path) -> None:
                 "version": "abc",
                 "detail": "",
             },
+
         )
         client = TestClient(TestServer(app))
         await client.start_server()

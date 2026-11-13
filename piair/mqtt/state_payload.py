@@ -11,10 +11,16 @@ from piair.reading import Reading
 
 def state_payload(config: AirConfig, reading: Reading) -> dict[str, Any]:
     sensors = config.sensors
-    return reading.public_state(
+    payload = reading.public_state(
         formaldehyde=sensors.formaldehyde.enabled,
         sen69c=sensors.sen69c.enabled,
     )
+    if sensors.sen69c.enabled:
+        payload["ambient_pressure_hpa"] = sensors.sen69c.ambient_pressure_hpa
+        payload["co2_calibration_target_ppm"] = sensors.sen69c.co2_calibration_target_ppm
+        if reading.co2_calibration_status:
+            payload["co2_calibration_status"] = reading.co2_calibration_status
+    return payload
 
 
 def dumps(payload: dict[str, Any]) -> str:

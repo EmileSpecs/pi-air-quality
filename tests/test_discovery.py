@@ -31,4 +31,9 @@ def test_sen69c_discovery_matches_golden(tmp_path: Path) -> None:
     assert "homeassistant/sensor/piair_lounge_air/pm4/config" in payloads
     assert "homeassistant/sensor/piair_lounge_air/voc_index/config" in payloads
     assert "homeassistant/sensor/piair_lounge_air/co2/config" in payloads
+    assert "homeassistant/number/piair_lounge_air/ambient_pressure/config" in payloads
+    assert "homeassistant/number/piair_lounge_air/co2_calibration_target/config" in payloads
+    assert "homeassistant/button/piair_lounge_air/calibrate_co2/config" in payloads
+    assert "homeassistant/button/piair_lounge_air/apply_co2_setup/config" in payloads
     assert "homeassistant/button/piair_lounge_air/update/config" in payloads
+

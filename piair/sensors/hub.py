@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import threading
 from datetime import datetime, timezone
 
 from piair.config import AirConfig
@@ -19,6 +20,7 @@ class SimulatedHub:
 
     def __init__(self, config: AirConfig) -> None:
         self.config = config
+        self.co2_calibration_status = ""
 
     def open(self) -> None:
         return None
@@ -40,6 +42,7 @@ class SimulatedHub:
             reading.voc_index = 100.0
             reading.nox_index = 1.0
             reading.co2_ppm = 640
+            reading.co2_calibration_status = self.co2_calibration_status
             if not sensors.formaldehyde.enabled:
                 reading.formaldehyde_ppb = 12.0
                 reading.formaldehyde_status = "ready"
@@ -50,6 +53,31 @@ class SimulatedHub:
                 reading.temperature_c = 22.5
                 reading.humidity_pct = 45.0
         return reading
+
+    def configure_co2(self) -> None:
+        self.co2_calibration_status = "setup applied (simulate)"
+        log.info("ASC disabled")
+        log.info(
+            "Ambient pressure set to %s hPa",
+            self.config.sensors.sen69c.ambient_pressure_hpa,
+        )
+
+    def set_ambient_pressure(self) -> None:
+        log.info(
+            "Ambient pressure set to %s hPa",
+            self.config.sensors.sen69c.ambient_pressure_hpa,
+        )
+
+    def calibrate_co2(self) -> int:
+        target = self.config.sensors.sen69c.co2_calibration_target_ppm
+        log.info(
+            "CO2 FRC starting (target %s ppm) — leave device in fresh outdoor air",
+            target,
+        )
+        correction = 0
+        self.co2_calibration_status = f"OK, correction {correction:+.0f} ppm (simulate)"
+        log.info("Forced recalibration OK, correction %+.0f ppm", correction)
+        return correction
 
 
 class SensorHub:
@@ -62,6 +90,8 @@ class SensorHub:
         self._sfa_seen = False
         self._sen_seen = False
         self._opened = False
+        self._lock = threading.Lock()
+        self.co2_calibration_status = ""
 
     def open(self) -> None:
         if self._opened:
@@ -82,33 +112,71 @@ class SensorHub:
             self._try_start(self._sfa, "formaldehyde")
 
     def close(self) -> None:
-        for sensor in (self._sen, self._sfa):
-            if sensor is not None:
-                sensor.close()
-        if self._owns_bus and isinstance(self._bus, SmbusTransport):
-            self._bus.close()
+        with self._lock:
+            for sensor in (self._sen, self._sfa):
+                if sensor is not None:
+                    sensor.close()
+            if self._owns_bus and isinstance(self._bus, SmbusTransport):
+                self._bus.close()
 
     def read(self) -> Reading:
-        if not self._opened:
-            self.open()
-        sensors = self.config.sensors
-        if sensors.formaldehyde.enabled or sensors.sen69c.enabled:
-            status = "missing"
-        else:
-            status = "disabled"
-        reading = Reading(formaldehyde_status=status)
-        if self._sen is None and sensors.sen69c.enabled:
-            reading.detail = "sen69c sensor was not opened"
-        elif self._sen is not None:
-            self._read_sen69c(reading, apply_hcho=not sensors.formaldehyde.enabled)
-        if self._sfa is None and sensors.formaldehyde.enabled:
-            reading.formaldehyde_status = "missing"
-            if not reading.detail:
-                reading.detail = "formaldehyde sensor was not opened"
-        elif self._sfa is not None:
-            self._read_sfa(reading, apply_climate=not sensors.sen69c.enabled)
-        reading.updated = datetime.now(timezone.utc).isoformat()
-        return reading
+        with self._lock:
+            if not self._opened:
+                self.open()
+            sensors = self.config.sensors
+            if sensors.formaldehyde.enabled or sensors.sen69c.enabled:
+                status = "missing"
+            else:
+                status = "disabled"
+            reading = Reading(
+                formaldehyde_status=status,
+                co2_calibration_status=self.co2_calibration_status,
+            )
+            if self._sen is None and sensors.sen69c.enabled:
+                reading.detail = "sen69c sensor was not opened"
+            elif self._sen is not None:
+                self._read_sen69c(reading, apply_hcho=not sensors.formaldehyde.enabled)
+            if self._sfa is None and sensors.formaldehyde.enabled:
+                reading.formaldehyde_status = "missing"
+                if not reading.detail:
+                    reading.detail = "formaldehyde sensor was not opened"
+            elif self._sfa is not None:
+                self._read_sfa(reading, apply_climate=not sensors.sen69c.enabled)
+            reading.updated = datetime.now(timezone.utc).isoformat()
+            return reading
+
+    def configure_co2(self) -> None:
+        with self._lock:
+            if self._sen is None:
+                raise RuntimeError("sen69c sensor was not opened")
+            cfg = self.config.sensors.sen69c
+            self._sen.configure_co2(
+                cfg.ambient_pressure_hpa,
+                asc_enabled=cfg.automatic_self_calibration,
+            )
+            self.co2_calibration_status = "setup applied"
+
+    def set_ambient_pressure(self) -> None:
+        with self._lock:
+            if self._sen is None:
+                raise RuntimeError("sen69c sensor was not opened")
+            self._sen.set_ambient_pressure(self.config.sensors.sen69c.ambient_pressure_hpa)
+
+    def calibrate_co2(self) -> int:
+        with self._lock:
+            if self._sen is None:
+                raise RuntimeError("sen69c sensor was not opened")
+            cfg = self.config.sensors.sen69c
+            try:
+                correction = self._sen.calibrate_co2(
+                    cfg.co2_calibration_target_ppm,
+                    cfg.ambient_pressure_hpa,
+                )
+            except RuntimeError:
+                self.co2_calibration_status = "FAILED (0xFFFF)"
+                raise
+            self.co2_calibration_status = f"OK, correction {correction:+.0f} ppm"
+            return correction
 
     def _try_start(self, sensor: Sen69c | Sfa40, name: str) -> None:
         try:

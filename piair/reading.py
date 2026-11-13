@@ -19,6 +19,7 @@ class Reading:
     voc_index: float | None = None
     nox_index: float | None = None
     co2_ppm: int | None = None
+    co2_calibration_status: str = ""
     detail: str = ""
     version: str = ""
     updated: str = ""

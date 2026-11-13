@@ -1,4 +1,72 @@
 {
+  "homeassistant/button/piair_lounge_air/apply_co2_setup/config": {
+    "availability": [
+      {
+        "topic": "piair/lounge_air/status"
+      }
+    ],
+    "availability_mode": "all",
+    "command_topic": "piair/lounge_air/cmd/apply_co2_setup",
+    "default_entity_id": "button.lounge_air_apply_co2_setup",
+    "device": {
+      "configuration_url": "http://192.168.1.20:8092",
+      "hw_version": "Raspberry Pi 5",
+      "identifiers": [
+        "piair_lounge_air"
+      ],
+      "manufacturer": "DIY",
+      "model": "Raspberry Pi 5 Air Quality",
+      "name": "Lounge air",
+      "suggested_area": "Lounge",
+      "sw_version": "1.0.0"
+    },
+    "entity_category": "config",
+    "has_entity_name": true,
+    "icon": "mdi:cog-sync",
+    "name": "Apply CO2 setup",
+    "origin": {
+      "name": "pi-air-quality",
+      "support_url": "https://github.com/EmileSpecs/pi-air-quality",
+      "sw_version": "1.0.0"
+    },
+    "payload_press": "PRESS",
+    "qos": 1,
+    "unique_id": "piair_lounge_air_apply_co2_setup"
+  },
+  "homeassistant/button/piair_lounge_air/calibrate_co2/config": {
+    "availability": [
+      {
+        "topic": "piair/lounge_air/status"
+      }
+    ],
+    "availability_mode": "all",
+    "command_topic": "piair/lounge_air/cmd/calibrate_co2",
+    "default_entity_id": "button.lounge_air_calibrate_co2",
+    "device": {
+      "configuration_url": "http://192.168.1.20:8092",
+      "hw_version": "Raspberry Pi 5",
+      "identifiers": [
+        "piair_lounge_air"
+      ],
+      "manufacturer": "DIY",
+      "model": "Raspberry Pi 5 Air Quality",
+      "name": "Lounge air",
+      "suggested_area": "Lounge",
+      "sw_version": "1.0.0"
+    },
+    "entity_category": "config",
+    "has_entity_name": true,
+    "icon": "mdi:molecule-co2",
+    "name": "Calibrate CO2 now",
+    "origin": {
+      "name": "pi-air-quality",
+      "support_url": "https://github.com/EmileSpecs/pi-air-quality",
+      "sw_version": "1.0.0"
+    },
+    "payload_press": "PRESS",
+    "qos": 1,
+    "unique_id": "piair_lounge_air_calibrate_co2"
+  },
   "homeassistant/button/piair_lounge_air/update/config": {
     "availability": [
       {
@@ -32,6 +100,87 @@
     "payload_press": "PRESS",
     "qos": 1,
     "unique_id": "piair_lounge_air_update"
+  },
+  "homeassistant/number/piair_lounge_air/ambient_pressure/config": {
+    "availability": [
+      {
+        "topic": "piair/lounge_air/status"
+      }
+    ],
+    "availability_mode": "all",
+    "command_topic": "piair/lounge_air/cmd/ambient_pressure",
+    "default_entity_id": "number.lounge_air_ambient_pressure",
+    "device": {
+      "configuration_url": "http://192.168.1.20:8092",
+      "hw_version": "Raspberry Pi 5",
+      "identifiers": [
+        "piair_lounge_air"
+      ],
+      "manufacturer": "DIY",
+      "model": "Raspberry Pi 5 Air Quality",
+      "name": "Lounge air",
+      "suggested_area": "Lounge",
+      "sw_version": "1.0.0"
+    },
+    "device_class": "atmospheric_pressure",
+    "entity_category": "config",
+    "has_entity_name": true,
+    "icon": "mdi:gauge",
+    "max": 1200,
+    "min": 700,
+    "mode": "box",
+    "name": "Ambient pressure",
+    "origin": {
+      "name": "pi-air-quality",
+      "support_url": "https://github.com/EmileSpecs/pi-air-quality",
+      "sw_version": "1.0.0"
+    },
+    "qos": 1,
+    "state_topic": "piair/lounge_air/state",
+    "step": 1,
+    "unique_id": "piair_lounge_air_ambient_pressure",
+    "unit_of_measurement": "hPa",
+    "value_template": "{{ value_json.ambient_pressure_hpa }}"
+  },
+  "homeassistant/number/piair_lounge_air/co2_calibration_target/config": {
+    "availability": [
+      {
+        "topic": "piair/lounge_air/status"
+      }
+    ],
+    "availability_mode": "all",
+    "command_topic": "piair/lounge_air/cmd/co2_calibration_target",
+    "default_entity_id": "number.lounge_air_co2_calibration_target",
+    "device": {
+      "configuration_url": "http://192.168.1.20:8092",
+      "hw_version": "Raspberry Pi 5",
+      "identifiers": [
+        "piair_lounge_air"
+      ],
+      "manufacturer": "DIY",
+      "model": "Raspberry Pi 5 Air Quality",
+      "name": "Lounge air",
+      "suggested_area": "Lounge",
+      "sw_version": "1.0.0"
+    },
+    "entity_category": "config",
+    "has_entity_name": true,
+    "icon": "mdi:target",
+    "max": 1200,
+    "min": 350,
+    "mode": "box",
+    "name": "CO2 calibration target",
+    "origin": {
+      "name": "pi-air-quality",
+      "support_url": "https://github.com/EmileSpecs/pi-air-quality",
+      "sw_version": "1.0.0"
+    },
+    "qos": 1,
+    "state_topic": "piair/lounge_air/state",
+    "step": 1,
+    "unique_id": "piair_lounge_air_co2_calibration_target",
+    "unit_of_measurement": "ppm",
+    "value_template": "{{ value_json.co2_calibration_target_ppm }}"
   },
   "homeassistant/sensor/piair_lounge_air/co2/config": {
     "availability": [
@@ -67,6 +216,40 @@
     "unique_id": "piair_lounge_air_co2",
     "unit_of_measurement": "ppm",
     "value_template": "{{ value_json.co2_ppm }}"
+  },
+  "homeassistant/sensor/piair_lounge_air/co2_calibration_status/config": {
+    "availability": [
+      {
+        "topic": "piair/lounge_air/status"
+      }
+    ],
+    "availability_mode": "all",
+    "default_entity_id": "sensor.lounge_air_co2_calibration_status",
+    "device": {
+      "configuration_url": "http://192.168.1.20:8092",
+      "hw_version": "Raspberry Pi 5",
+      "identifiers": [
+        "piair_lounge_air"
+      ],
+      "manufacturer": "DIY",
+      "model": "Raspberry Pi 5 Air Quality",
+      "name": "Lounge air",
+      "suggested_area": "Lounge",
+      "sw_version": "1.0.0"
+    },
+    "entity_category": "diagnostic",
+    "has_entity_name": true,
+    "icon": "mdi:information-outline",
+    "name": "CO2 calibration status",
+    "origin": {
+      "name": "pi-air-quality",
+      "support_url": "https://github.com/EmileSpecs/pi-air-quality",
+      "sw_version": "1.0.0"
+    },
+    "qos": 1,
+    "state_topic": "piair/lounge_air/state",
+    "unique_id": "piair_lounge_air_co2_calibration_status",
+    "value_template": "{{ value_json.co2_calibration_status }}"
   },
   "homeassistant/sensor/piair_lounge_air/formaldehyde/config": {
     "availability": [

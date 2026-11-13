@@ -36,6 +36,8 @@ def test_secrets_and_env_override(tmp_path: Path) -> None:
     assert config.admin.password == "secret-admin"
     assert config.mqtt.host == "10.1.1.8"
     assert config.sensors.sen69c.enabled is True
+    assert config.sensors.sen69c.ambient_pressure_hpa == 865
+    assert config.sensors.sen69c.automatic_self_calibration is False
     assert config.sensors.formaldehyde.enabled is True
 
 

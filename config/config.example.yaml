@@ -28,6 +28,11 @@ sensors:
   publish_interval_s: 10
   sen69c:
     enabled: true
+    automatic_self_calibration: false
+    ambient_pressure_hpa: 865
+    co2_calibration_target_ppm: 420
+    co2_setup_delay_s: 15
+    pressure_refresh_interval_s: 3600
   formaldehyde:
     enabled: false
 

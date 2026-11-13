@@ -121,12 +121,43 @@ class SensorBlock(BaseModel):
     enabled: bool = False
 
 
+class Sen69cConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    enabled: bool = True
+    automatic_self_calibration: bool = False
+    ambient_pressure_hpa: int = 865
+    co2_calibration_target_ppm: int = 420
+    co2_setup_delay_s: float = 15
+    pressure_refresh_interval_s: float = 3600
+
+    @field_validator("ambient_pressure_hpa")
+    @classmethod
+    def _pressure(cls, value: int) -> int:
+        if not 700 <= value <= 1200:
+            raise ValueError("ambient_pressure_hpa must be between 700 and 1200")
+        return value
+
+    @field_validator("co2_calibration_target_ppm")
+    @classmethod
+    def _co2_target(cls, value: int) -> int:
+        if not 350 <= value <= 1200:
+            raise ValueError("co2_calibration_target_ppm must be between 350 and 1200")
+        return value
+
+    @field_validator("co2_setup_delay_s", "pressure_refresh_interval_s")
+    @classmethod
+    def _positive_delay(cls, value: float) -> float:
+        if value <= 0:
+            raise ValueError("intervals must be greater than 0")
+        return value
+
+
 class SensorsConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
     bus: int = 1
     interval_s: float = 1
     publish_interval_s: float = 10
-    sen69c: SensorBlock = Field(default_factory=lambda: SensorBlock(enabled=True))
+    sen69c: Sen69cConfig = Field(default_factory=Sen69cConfig)
     formaldehyde: SensorBlock = Field(default_factory=SensorBlock)
 
     @field_validator("interval_s", "publish_interval_s")

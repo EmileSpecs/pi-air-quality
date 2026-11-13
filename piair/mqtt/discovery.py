@@ -136,6 +136,79 @@ def _add_climate(add, config: AirConfig, topics: Topics) -> None:
     )
 
 
+def _add_co2_controls(add, config: AirConfig, topics: Topics) -> None:
+    add(
+        "number",
+        "ambient_pressure",
+        {
+            **_identity(config, "number", "ambient_pressure", "Ambient pressure"),
+            "command_topic": topics.command("ambient_pressure"),
+            "state_topic": topics.state(),
+            "value_template": "{{ value_json.ambient_pressure_hpa }}",
+            "min": 700,
+            "max": 1200,
+            "step": 1,
+            "unit_of_measurement": "hPa",
+            "device_class": "atmospheric_pressure",
+            "entity_category": "config",
+            "mode": "box",
+            "icon": "mdi:gauge",
+        },
+    )
+    add(
+        "number",
+        "co2_calibration_target",
+        {
+            **_identity(config, "number", "co2_calibration_target", "CO2 calibration target"),
+            "command_topic": topics.command("co2_calibration_target"),
+            "state_topic": topics.state(),
+            "value_template": "{{ value_json.co2_calibration_target_ppm }}",
+            "min": 350,
+            "max": 1200,
+            "step": 1,
+            "unit_of_measurement": "ppm",
+            "entity_category": "config",
+            "mode": "box",
+            "icon": "mdi:target",
+        },
+    )
+    add(
+        "button",
+        "calibrate_co2",
+        {
+            **_identity(config, "button", "calibrate_co2", "Calibrate CO2 now"),
+            "command_topic": topics.command("calibrate_co2"),
+            "payload_press": "PRESS",
+            "entity_category": "config",
+            "icon": "mdi:molecule-co2",
+        },
+    )
+    add(
+        "button",
+        "apply_co2_setup",
+        {
+            **_identity(config, "button", "apply_co2_setup", "Apply CO2 setup"),
+            "command_topic": topics.command("apply_co2_setup"),
+            "payload_press": "PRESS",
+            "entity_category": "config",
+            "icon": "mdi:cog-sync",
+        },
+    )
+    add(
+        "sensor",
+        "co2_calibration_status",
+        _sensor(
+            config,
+            topics,
+            "co2_calibration_status",
+            "CO2 calibration status",
+            "co2_calibration_status",
+            entity_category="diagnostic",
+            icon="mdi:information-outline",
+        ),
+    )
+
+
 def build_component_payloads(
     config: AirConfig,
     ctx: DiscoveryContext | None = None,
@@ -214,6 +287,7 @@ def build_component_payloads(
                 state_class="measurement",
             ),
         )
+        _add_co2_controls(add, config, topics)
 
     add(
         "sensor",

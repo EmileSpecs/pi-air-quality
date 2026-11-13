@@ -1,4 +1,4 @@
-"""Publish discovery and state, and accept the update button."""
+"""Publish discovery and state, and accept HA command buttons/numbers."""
 
 from __future__ import annotations
 
@@ -27,6 +27,10 @@ class MqttBridge:
         *,
         context: DiscoveryContext | None = None,
         on_update: Callable[[], Awaitable[None]] | None = None,
+        on_apply_co2_setup: Callable[[], Awaitable[None]] | None = None,
+        on_calibrate_co2: Callable[[], Awaitable[None]] | None = None,
+        on_set_ambient_pressure: Callable[[int], Awaitable[None]] | None = None,
+        on_set_co2_target: Callable[[int], Awaitable[None]] | None = None,
         on_connected: Callable[[], None] | None = None,
     ) -> None:
         self.config = config
@@ -34,6 +38,10 @@ class MqttBridge:
         self.store = store
         self.context = context or DiscoveryContext(support_url=config.support_url())
         self.on_update = on_update
+        self.on_apply_co2_setup = on_apply_co2_setup
+        self.on_calibrate_co2 = on_calibrate_co2
+        self.on_set_ambient_pressure = on_set_ambient_pressure
+        self.on_set_co2_target = on_set_co2_target
         self.on_connected = on_connected
         self.topics = Topics(config)
         self.connected = False
@@ -188,6 +196,22 @@ class MqttBridge:
         if message.topic == self.topics.command("update") and message.payload == "PRESS":
             if self.on_update is not None:
                 await self.on_update()
+            return
+        if message.topic == self.topics.command("apply_co2_setup") and message.payload == "PRESS":
+            if self.on_apply_co2_setup is not None:
+                await self.on_apply_co2_setup()
+            return
+        if message.topic == self.topics.command("calibrate_co2") and message.payload == "PRESS":
+            if self.on_calibrate_co2 is not None:
+                await self.on_calibrate_co2()
+            return
+        if message.topic == self.topics.command("ambient_pressure"):
+            if self.on_set_ambient_pressure is not None:
+                await self.on_set_ambient_pressure(int(float(message.payload)))
+            return
+        if message.topic == self.topics.command("co2_calibration_target"):
+            if self.on_set_co2_target is not None:
+                await self.on_set_co2_target(int(float(message.payload)))
 
     async def _publish(self, topic: str, payload: str, *, retain: bool, qos: int) -> None:
         if not self.transport.connected:

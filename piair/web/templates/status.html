@@ -5,19 +5,20 @@
   {% if error %}<p class="error">{{ error }}</p>{% endif %}
   <div class="grid" id="readings">
     {% if snap.formaldehyde_enabled %}
-    <div class="card"><div class="label">Formaldehyde</div><div class="value" id="hcho">{{ snap.formaldehyde }}</div></div>
+    <div class="card"><div class="label">Formaldehyde</div><div class="value {% if snap.formaldehyde_band %}band-{{ snap.formaldehyde_band }}{% endif %}" id="hcho">{{ snap.formaldehyde }}</div></div>
     <div class="card"><div class="label">Status</div><div class="value" id="hcho-status">{{ snap.formaldehyde_status }}</div></div>
     {% endif %}
     <div class="card"><div class="label">Temperature</div><div class="value" id="temp">{{ snap.temperature }}</div></div>
     <div class="card"><div class="label">Humidity</div><div class="value" id="humidity">{{ snap.humidity }}</div></div>
     {% if snap.sen69c_enabled %}
-    <div class="card"><div class="label">PM1</div><div class="value" id="pm1">{{ snap.pm1 }}</div></div>
-    <div class="card"><div class="label">PM2.5</div><div class="value" id="pm25">{{ snap.pm25 }}</div></div>
-    <div class="card"><div class="label">PM4</div><div class="value" id="pm4">{{ snap.pm4 }}</div></div>
-    <div class="card"><div class="label">PM10</div><div class="value" id="pm10">{{ snap.pm10 }}</div></div>
-    <div class="card"><div class="label">VOC index</div><div class="value" id="voc">{{ snap.voc_index }}</div></div>
-    <div class="card"><div class="label">NOx index</div><div class="value" id="nox">{{ snap.nox_index }}</div></div>
-    <div class="card"><div class="label">CO2</div><div class="value" id="co2">{{ snap.co2 }}</div></div>
+    <div class="card"><div class="label">PM1</div><div class="value {% if snap.pm1_band %}band-{{ snap.pm1_band }}{% endif %}" id="pm1">{{ snap.pm1 }}</div></div>
+    <div class="card"><div class="label">PM2.5</div><div class="value {% if snap.pm25_band %}band-{{ snap.pm25_band }}{% endif %}" id="pm25">{{ snap.pm25 }}</div></div>
+    <div class="card"><div class="label">PM4</div><div class="value {% if snap.pm4_band %}band-{{ snap.pm4_band }}{% endif %}" id="pm4">{{ snap.pm4 }}</div></div>
+    <div class="card"><div class="label">PM10</div><div class="value {% if snap.pm10_band %}band-{{ snap.pm10_band }}{% endif %}" id="pm10">{{ snap.pm10 }}</div></div>
+    <div class="card"><div class="label">VOC index</div><div class="value {% if snap.voc_band %}band-{{ snap.voc_band }}{% endif %}" id="voc">{{ snap.voc_index }}</div></div>
+    <div class="card"><div class="label">NOx index</div><div class="value {% if snap.nox_band %}band-{{ snap.nox_band }}{% endif %}" id="nox">{{ snap.nox_index }}</div></div>
+    <div class="card"><div class="label">CO2</div><div class="value {% if snap.co2_band %}band-{{ snap.co2_band }}{% endif %}" id="co2">{{ snap.co2 }}</div></div>
+    <div class="card"><div class="label">CO2 calibration</div><div class="value" id="co2-status" style="font-size:1rem">{{ snap.co2_calibration_status }}</div></div>
     {% endif %}
   </div>
   <p class="muted" id="meta">MQTT {{ snap.mqtt }} · updated {{ snap.updated }} · {{ snap.version }}</p>
@@ -32,22 +33,38 @@
   </form>
   <p class="muted">Automatic updates fast-forward <code>{{ config.update.repo or "origin" }}</code> and leave <code>/etc/pi-air</code> alone.</p>
   <script>
+    const bands = ["green", "yellow", "amber", "red"];
+    function setBand(id, band) {
+      const node = document.getElementById(id);
+      if (!node) return;
+      for (const name of bands) node.classList.remove("band-" + name);
+      if (band) node.classList.add("band-" + band);
+    }
     async function refresh() {
       const response = await fetch("/status.json", {cache: "no-store"});
       if (!response.ok) return;
       const snap = await response.json();
       const set = (id, text) => { const node = document.getElementById(id); if (node) node.textContent = text; };
       set("hcho", snap.formaldehyde);
+      setBand("hcho", snap.formaldehyde_band);
       set("hcho-status", snap.formaldehyde_status);
       set("temp", snap.temperature);
       set("humidity", snap.humidity);
       set("pm1", snap.pm1);
+      setBand("pm1", snap.pm1_band);
       set("pm25", snap.pm25);
+      setBand("pm25", snap.pm25_band);
       set("pm4", snap.pm4);
+      setBand("pm4", snap.pm4_band);
       set("pm10", snap.pm10);
+      setBand("pm10", snap.pm10_band);
       set("voc", snap.voc_index);
+      setBand("voc", snap.voc_band);
       set("nox", snap.nox_index);
+      setBand("nox", snap.nox_band);
       set("co2", snap.co2);
+      setBand("co2", snap.co2_band);
+      set("co2-status", snap.co2_calibration_status);
       set("meta", "MQTT " + snap.mqtt + " · updated " + snap.updated + " · " + snap.version);
       const detail = document.getElementById("detail");
       if (detail) {

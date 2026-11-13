@@ -3,7 +3,7 @@
 import asyncio
 import json
 
-from piair.config import AirConfig, DeviceConfig, MqttConfig, SensorBlock, SensorsConfig
+from piair.config import AirConfig, DeviceConfig, MqttConfig, Sen69cConfig, SensorsConfig
 from piair.mqtt.bridge import MqttBridge
 from piair.mqtt.memory import Incoming, MemoryTransport
 from piair.reading import Reading
@@ -14,7 +14,7 @@ def _config() -> AirConfig:
     return AirConfig(
         device=DeviceConfig(id="lounge_air", name="Lounge air"),
         mqtt=MqttConfig(host="broker.local", username="kiosk", password="secret"),
-        sensors=SensorsConfig(sen69c=SensorBlock(enabled=True)),
+        sensors=SensorsConfig(sen69c=Sen69cConfig(enabled=True)),
     )
 
 
@@ -23,11 +23,21 @@ def test_connect_locks_device_and_publishes(tmp_path) -> None:
         transport = MemoryTransport()
         store = StateStore(tmp_path / "state.json")
         updates: list[str] = []
+        calibrated: list[str] = []
 
         async def on_update() -> None:
             updates.append("pressed")
 
-        bridge = MqttBridge(_config(), transport, store, on_update=on_update)
+        async def on_calibrate() -> None:
+            calibrated.append("frc")
+
+        bridge = MqttBridge(
+            _config(),
+            transport,
+            store,
+            on_update=on_update,
+            on_calibrate_co2=on_calibrate,
+        )
         bridge.reading = Reading(
             formaldehyde_ppb=12.0,
             temperature_c=22.5,
@@ -40,6 +50,7 @@ def test_connect_locks_device_and_publishes(tmp_path) -> None:
             voc_index=100.0,
             nox_index=1.0,
             co2_ppm=640,
+            co2_calibration_status="setup applied",
             version="abc1234",
             updated="2026-10-26T12:00:00+00:00",
         )
@@ -54,12 +65,18 @@ def test_connect_locks_device_and_publishes(tmp_path) -> None:
         assert state["formaldehyde_ppb"] == 12.0
         assert state["pm4"] == 9.0
         assert state["co2_ppm"] == 640
+        assert state["ambient_pressure_hpa"] == 865
+        assert state["co2_calibration_target_ppm"] == 420
         await bridge._on_message(Incoming("piair/lounge_air/cmd/update", "PRESS", retain=True))
         assert updates == []
         await bridge._on_message(Incoming("piair/lounge_air/cmd/update", "PRESS", retain=False))
         assert updates == ["pressed"]
+        await bridge._on_message(Incoming("piair/lounge_air/cmd/calibrate_co2", "PRESS", retain=False))
+        assert calibrated == ["frc"]
         await bridge._on_message(Incoming("homeassistant/status", "online"))
         assert any(item.topic.endswith("/pm4/config") for item in transport.published)
         assert any(item.topic.endswith("/formaldehyde/config") for item in transport.published)
+        assert any(item.topic.endswith("/ambient_pressure/config") for item in transport.published)
+        assert any(item.topic.endswith("/calibrate_co2/config") for item in transport.published)
 
     asyncio.run(scenario())
